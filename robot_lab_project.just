@@ -7,9 +7,23 @@ set no-exit-message # suppress just's "error: recipe failed" — recipes print t
 set no-cd           # run recipes relative to the justfile location, not the caller's cwd
 
 repos := "robot_lab robot_lab-a2a robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails"
+github := "git@github.com:MadBomber"
 
 [private]
 default: list
+
+[group('setup')]
+[doc('Clone all repos into the current directory (safe to run on an existing workspace)')]
+clone:
+    #!/usr/bin/env bash
+    for repo in {{repos}}; do
+      if [ -d "$repo" ]; then
+        printf '\033[1;33m%-30s\033[0m already exists — skipping\n' "$repo"
+      else
+        printf '\033[1;32m%-30s\033[0m cloning...\n' "$repo"
+        git clone "{{github}}/$repo.git"
+      fi
+    done
 
 # Full health dashboard: dirty working trees + unpushed commits + active path: overrides + version lockstep
 [group('overview')]
