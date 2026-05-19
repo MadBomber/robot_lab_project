@@ -79,6 +79,9 @@ paths:
 [doc('Check extension version lockstep against RobotLab::VERSION')]
 versions:
     #!/usr/bin/env ruby
+    require 'net/http'
+    require 'json'
+
     def extract_version(repo)
       file = Dir.glob("#{repo}/lib/**/version.rb").first
       return "(version.rb not found)" unless file
@@ -90,13 +93,28 @@ versions:
       branch.empty? ? "?" : branch
     end
 
+    def rubygems_latest(gemname)
+      response = Net::HTTP.get_response(URI("https://rubygems.org/api/v1/gems/#{gemname}.json"))
+      return nil unless response.is_a?(Net::HTTPSuccess)
+      data = JSON.parse(response.body)
+      date = data['version_created_at'].to_s[0, 10]
+      [data['version'], date]
+    rescue
+      nil
+    end
+
     core_version  = extract_version("robot_lab")
     core_branch   = branch_for("robot_lab")
     core_segments = core_version.split(".").first(3).join(".")
+    core_rg       = rubygems_latest("robot_lab")
+    core_rg_str   = core_rg ? "#{core_rg[1]} v#{core_rg[0]}" : "(not on RubyGems)"
 
     extensions = %w[robot_lab-a2a robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails]
 
-    puts "\nCore: robot_lab #{core_version}  (#{core_branch})\n"
+    col = 28
+    puts ""
+    puts "#{"Core:".ljust(6)}  #{"robot_lab".ljust(col)} #{core_version}  (#{core_branch}) #{core_rg_str}"
+    puts ""
 
     failures = []
     extensions.each do |repo|
@@ -105,9 +123,11 @@ versions:
       ext_base    = version.split(".").first(3).join(".")
       ok          = ext_base == core_segments
       failures   << repo unless ok
-      badge       = ok ? "\e[32m OK \e[0m" : "\e[31mFAIL\e[0m"
+      badge       = ok ? "\e[32m[ OK ]\e[0m" : "\e[31m[FAIL]\e[0m"
       suffix      = version.split(".").length > 3 ? "  (extension patch)" : ""
-      puts "  [#{badge}]  #{repo.ljust(28)} #{version}  (#{branch})#{suffix}"
+      rg          = rubygems_latest(repo)
+      rg_str      = rg ? "#{rg[1]} v#{rg[0]}" : "(not on RubyGems)"
+      puts "#{badge}  #{repo.ljust(col)} #{version}  (#{branch}) #{rg_str}#{suffix}"
     end
 
     puts ""
