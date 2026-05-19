@@ -85,22 +85,29 @@ versions:
       File.read(file)[/VERSION\s*=\s*['"]([^'"]+)['"]/, 1] || "(VERSION not found)"
     end
 
+    def branch_for(repo)
+      branch = `git -C #{repo} rev-parse --abbrev-ref HEAD 2>/dev/null`.strip
+      branch.empty? ? "?" : branch
+    end
+
     core_version  = extract_version("robot_lab")
+    core_branch   = branch_for("robot_lab")
     core_segments = core_version.split(".").first(3).join(".")
 
     extensions = %w[robot_lab-a2a robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails]
 
-    puts "\nCore: robot_lab #{core_version}\n"
+    puts "\nCore: robot_lab #{core_version}  (#{core_branch})\n"
 
     failures = []
     extensions.each do |repo|
       version     = extract_version(repo)
+      branch      = branch_for(repo)
       ext_base    = version.split(".").first(3).join(".")
       ok          = ext_base == core_segments
       failures   << repo unless ok
       badge       = ok ? "\e[32m OK \e[0m" : "\e[31mFAIL\e[0m"
       suffix      = version.split(".").length > 3 ? "  (extension patch)" : ""
-      puts "  [#{badge}]  #{repo.ljust(28)} #{version}#{suffix}"
+      puts "  [#{badge}]  #{repo.ljust(28)} #{version}  (#{branch})#{suffix}"
     end
 
     puts ""
