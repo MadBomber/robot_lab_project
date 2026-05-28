@@ -10,6 +10,7 @@ This directory is the **RobotLab project workspace** — a collection of 7 close
 |------|---------|
 | `robot_lab` | Core framework: robots, networks, MCP, memory |
 | `robot_lab-a2a` | Agent2Agent (A2A) protocol adapter over HTTP+SSE |
+| `robot_lab-audit` | SQLite-backed execution audit log via the Hook system |
 | `robot_lab-document_store` | Vector embeddings & semantic search (fastembed + TF-IDF fallback) |
 | `robot_lab-durable` | Cross-session persistent learning |
 | `robot_lab-ractor` | CPU parallelism via Ractors |
@@ -37,11 +38,12 @@ Coverage thresholds enforced in CI: **95% line, 75% branch**. Flog gates: warn �
 
 ```
 robot_lab  (core)
-  ├── robot_lab-rails         depends on robot_lab
-  ├── robot_lab-durable       depends on robot_lab
-  ├── robot_lab-ractor        depends on robot_lab
+  ├── robot_lab-a2a             depends on robot_lab + simple_a2a
+  ├── robot_lab-audit           depends on robot_lab + sqlite3
   ├── robot_lab-document_store  depends on robot_lab
-  └── robot_lab-a2a           depends on robot_lab + simple_a2a
+  ├── robot_lab-durable         depends on robot_lab
+  ├── robot_lab-ractor          depends on robot_lab
+  └── robot_lab-rails           depends on robot_lab
 ```
 
 Extension gems register themselves at load time via `RobotLab.register_extension`. During cross-gem development, `Gemfile` in extension repos points to the local `robot_lab` path via `gem "robot_lab", path: "../robot_lab"`.
@@ -82,6 +84,7 @@ LLM API keys are passed as env vars per provider (e.g. `ANTHROPIC_API_KEY`, `OPE
 ## Extension Gem Patterns
 
 - **robot_lab-a2a**: Adapts `RobotLab::Robot` / `RobotLab::Network` to the A2A HTTP+SSE protocol. Two adapter modes: `:acp_tool` (injects `AskUserTool` for multi-turn input) and `:io_bridge` (replaces I/O streams). Supersedes the retired `robot_lab-acp` gem.
+- **robot_lab-audit**: SQLite-backed execution audit log via `RobotLab::Hook`. `RobotLab::Audit.enable(db_path:)` wires it globally. Records network runs, robot invocations, tool calls, and errors with timestamps and duration for post-mortem analysis.
 - **robot_lab-document_store**: `RobotLab::DocumentStore` — add documents, query by semantic similarity. Uses fastembed when available, falls back to TF-IDF cosine
 - **robot_lab-durable**: Persistence layer for robot memory and learned behaviors across sessions
 - **robot_lab-ractor**: `RobotLab::RactorPool` for CPU-parallel robot execution; configured via `ractor_pool_size` in RunConfig

@@ -38,6 +38,7 @@ Run `just` with no arguments at any time to see all available workspace tasks.
 | Gem | Description |
 |-----|-------------|
 | [robot_lab-a2a](https://github.com/MadBomber/robot_lab-a2a) | Exposes robots and networks as agents over the Agent2Agent (A2A) HTTP+SSE protocol |
+| [robot_lab-audit](https://github.com/MadBomber/robot_lab-audit) | SQLite-backed execution audit log — captures network runs, robot invocations, tool calls, and errors for post-mortem analysis |
 | [robot_lab-document_store](https://github.com/MadBomber/robot_lab-document_store) | Vector embeddings and semantic search using fastembed with a TF-IDF fallback |
 | [robot_lab-durable](https://github.com/MadBomber/robot_lab-durable) | Persistent cross-session learning and memory for robots |
 | [robot_lab-ractor](https://github.com/MadBomber/robot_lab-ractor) | CPU-parallel robot execution via Ruby Ractors |

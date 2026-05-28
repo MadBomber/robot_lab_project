@@ -6,7 +6,7 @@ import '~/.justfile'
 set no-exit-message # suppress just's "error: recipe failed" — recipes print their own errors
 set no-cd           # run recipes relative to the justfile location, not the caller's cwd
 
-repos := "robot_lab robot_lab-a2a robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails"
+repos := "robot_lab robot_lab-a2a robot_lab-audit robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails"
 github := "git@github.com:MadBomber"
 
 [private]
@@ -109,7 +109,7 @@ versions:
     core_rg       = rubygems_latest("robot_lab")
     core_rg_str   = core_rg ? "#{core_rg[1]} v#{core_rg[0]}" : "(not on RubyGems)"
 
-    extensions = %w[robot_lab-a2a robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails]
+    extensions = %w[robot_lab-a2a robot_lab-audit robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails]
 
     col = 28
     puts ""
@@ -178,7 +178,7 @@ bump-versions version="":
       File.write(file, updated)
     end
 
-    extensions = %w[robot_lab-a2a robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails]
+    extensions = %w[robot_lab-a2a robot_lab-audit robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails]
 
     target = "{{version}}"
     if target.empty?
@@ -204,7 +204,7 @@ bump-versions version="":
 [doc('Propagate Rakefile.common to all extension repos')]
 sync-rakefiles:
     #!/usr/bin/env bash
-    for repo in robot_lab-a2a robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails; do
+    for repo in robot_lab-a2a robot_lab-audit robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails; do
       cp Rakefile.common "$repo/Rakefile"
       printf '\033[1;32m%-30s\033[0m updated\n' "$repo"
     done
