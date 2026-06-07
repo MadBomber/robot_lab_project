@@ -1,0 +1,91 @@
+# frozen_string_literal: true
+# Shared per-repo development tasks. Imported by each sub-repo's .loki via import_up.
+
+class Tasks
+  @@gem_name ||= File.basename(Dir.pwd).freeze
+
+  helper(:gem_version) do
+    file = Dir.glob("lib/**/version.rb").first
+    file ? File.read(file)[/VERSION\s*=\s*['"]([^'"]+)['"]/, 1] : "?.?.?" rescue "?.?.?"
+  end
+
+  desc "Run the test suite"
+  def test
+    sh "bundle exec rake test"
+  end
+
+  desc "Run tests with verbose output"
+  def test_verbose
+    sh "bundle exec rake test_verbose"
+  end
+
+  desc "Check code style with RuboCop"
+  def rubocop
+    sh "bundle exec rubocop"
+  end
+
+  desc "Auto-correct RuboCop offenses"
+  def rubocop_fix
+    sh "bundle exec rubocop -a"
+  end
+
+  desc "Check code complexity with Flog (warn >=20, fail >=50)"
+  def flog
+    sh "bundle exec rake flog_check"
+  end
+
+  desc "Check for structural code duplication with Flay (mass >= 150)"
+  def flay
+    sh "bundle exec rake flay_check"
+  end
+
+  desc "Run all quality gates: tests + RuboCop + Flog + Flay"
+  depends_on [:test, :rubocop, :flog, :flay]
+  def quality
+    puts "\nAll quality gates passed."
+  end
+
+  desc "Open IRB console with gem loaded"
+  def console
+    if File.exist?("bin/console")
+      sh "bin/console"
+    else
+      sh "bundle exec irb -Ilib -r #{@@gem_name.tr('-', '/')}"
+    end
+  end
+
+  desc "Build gem package"
+  def build
+    sh "bundle exec rake build"
+  end
+
+  desc "Build and install gem locally"
+  depends_on :build
+  def install
+    sh "bundle exec rake install"
+  end
+
+  desc "release", "Release gem to RubyGems (runs quality gate first)"
+  option :yes, aliases: "-y", type: :boolean, default: false, desc: "Skip confirmation prompt"
+  depends_on :quality
+  def release
+    version = gem_version
+
+    unless options[:yes]
+      print "Release #{@@gem_name} v#{version} to RubyGems? [y/N] "
+      $stdout.flush
+      return puts "Aborted." unless $stdin.gets.strip.downcase == "y"
+    end
+
+    abort "Working directory is not clean — commit or stash changes first." unless `git status --porcelain`.strip.empty?
+
+    tag = "v#{version}"
+    abort "Tag #{tag} already exists." unless `git tag -l "#{tag}"`.strip.empty?
+
+    sh "bundle exec rake build"
+    sh "git tag #{tag}"
+    sh "git push origin #{tag}"
+    sh "gem push pkg/#{@@gem_name}-#{version}.gem"
+    puts "\nReleased #{@@gem_name} v#{version}."
+  end
+end
