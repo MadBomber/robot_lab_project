@@ -2,7 +2,7 @@
 # Git operations across all repos.
 
 class Tasks
-  @@repos  ||= %w[robot_lab robot_lab-a2a robot_lab-audit robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails].freeze
+  @@repos  ||= %w[robot_lab robot_lab-a2a robot_lab-audit robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails robot_lab-to].freeze
   @@github ||= "git@github.com:MadBomber".freeze
 
   desc "Clone all repos (safe to run on an existing workspace)"

@@ -16,6 +16,7 @@ class Tasks
     robot_lab-durable
     robot_lab-ractor
     robot_lab-rails
+    robot_lab-to
   ].freeze
   @@extensions ||= (@@repos - ["robot_lab"]).freeze
   @@github     ||= "git@github.com:MadBomber".freeze
@@ -29,4 +30,9 @@ class Tasks
   footer "Run `asgard help <task>` for usage details"
 
   default_task :check
+
+  desc "aia [ARGS]", "Run aia/bin/aia with pass-through arguments (e.g. asgard aia --chat)"
+  def aia(*args)
+    sh "BUNDLE_GEMFILE=aia/Gemfile.local aia/bin/aia #{args.join(' ')}"
+  end
 end

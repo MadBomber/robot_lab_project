@@ -2,7 +2,7 @@
 # Cross-repo quality gates — per-gate status table.
 
 class Tasks
-  @@repos ||= %w[robot_lab robot_lab-a2a robot_lab-audit robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails].freeze
+  @@repos ||= %w[robot_lab robot_lab-a2a robot_lab-audit robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails robot_lab-to].freeze
 
   desc "Run tests in all repos (parallel, output buffered)"
   def test_all

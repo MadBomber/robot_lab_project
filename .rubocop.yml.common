@@ -52,6 +52,10 @@ Style/OneClassPerFile:
 Style/FormatString:
   Enabled: false
 
+# Unannotated %s / %-Ns tokens are acceptable alongside annotated %<name>s
+Style/FormatStringToken:
+  Enabled: false
+
 # String concatenation and interpolation are both acceptable
 Style/StringConcatenation:
   Enabled: false

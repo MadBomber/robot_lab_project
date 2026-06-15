@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Workspace Overview
 
-This directory is the **RobotLab project workspace** — a collection of 7 closely related Ruby gems that together form the RobotLab multi-robot LLM framework. Each subdirectory is an independent git repo with its own Gemfile, gemspec, tests, and `CLAUDE.md`.
+This directory is the **RobotLab project workspace** — a collection of 8 closely related Ruby gems that together form the RobotLab multi-robot LLM framework. Each subdirectory is an independent git repo with its own Gemfile, gemspec, tests, and `CLAUDE.md`.
 
 | Repo | Purpose |
 |------|---------|
@@ -15,6 +15,7 @@ This directory is the **RobotLab project workspace** — a collection of 7 close
 | `robot_lab-durable` | Cross-session persistent learning |
 | `robot_lab-ractor` | CPU parallelism via Ractors |
 | `robot_lab-rails` | ActiveJob, generators, Turbo broadcasts for Rails apps |
+| `robot_lab-to` | Autonomous overnight loop ("takeover") — iterates a robot toward an objective, committing each step |
 
 When working inside a specific sub-repo, that sub-repo's `CLAUDE.md` takes precedence.
 
@@ -43,7 +44,8 @@ robot_lab  (core)
   ├── robot_lab-document_store  depends on robot_lab
   ├── robot_lab-durable         depends on robot_lab
   ├── robot_lab-ractor          depends on robot_lab
-  └── robot_lab-rails           depends on robot_lab
+  ├── robot_lab-rails           depends on robot_lab
+  └── robot_lab-to              depends on robot_lab + myway_config
 ```
 
 Extension gems register themselves at load time via `RobotLab.register_extension`. During cross-gem development, `Gemfile` in extension repos points to the local `robot_lab` path via `gem "robot_lab", path: "../robot_lab"`.
@@ -88,3 +90,4 @@ LLM API keys are passed as env vars per provider (e.g. `ANTHROPIC_API_KEY`, `OPE
 - **robot_lab-document_store**: `RobotLab::DocumentStore` — add documents, query by semantic similarity. Uses fastembed when available, falls back to TF-IDF cosine
 - **robot_lab-durable**: Persistence layer for robot memory and learned behaviors across sessions
 - **robot_lab-ractor**: `RobotLab::RactorPool` for CPU-parallel robot execution; configured via `ractor_pool_size` in RunConfig
+- **robot_lab-to**: Autonomous loop ("takeover") harness. `RobotLab::To.run(objective, **opts)` or `robot-to` CLI. Per-iteration: fresh robot + `SubmitResultTool` → commit on success / `reset --hard` on failure. Cross-iteration memory via `notes.md` injected into each robot's system prompt. Run state in `.robot_lab_to/runs/<run_id>/`. Stop conditions: `max_iterations`, `max_tokens`, `max_consecutive_failures`, natural-language `stop_when`.
