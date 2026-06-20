@@ -17,6 +17,7 @@ class Tasks
     robot_lab-ractor
     robot_lab-rails
     robot_lab-to
+    robot_lab-web
   ].freeze
   @@extensions ||= (@@repos - ["robot_lab"]).freeze
   @@github     ||= "git@github.com:MadBomber".freeze

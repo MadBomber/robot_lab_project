@@ -2,7 +2,7 @@
 # Sync shared files and bump versions across repos.
 
 class Tasks
-  @@repos      ||= %w[robot_lab robot_lab-a2a robot_lab-audit robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails robot_lab-to].freeze
+  @@repos      ||= %w[robot_lab robot_lab-a2a robot_lab-audit robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails robot_lab-to robot_lab-web].freeze
   @@extensions ||= (@@repos - ["robot_lab"]).freeze
 
   desc "set_env [ENV]", "Switch gems between local (path:) and released. ENV: local|real (omit to toggle)"

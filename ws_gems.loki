@@ -2,8 +2,18 @@
 # Gem lifecycle tasks across all repos.
 
 class Tasks
-  @@repos      ||= %w[robot_lab robot_lab-a2a robot_lab-audit robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails robot_lab-to].freeze
+  @@repos      ||= %w[robot_lab robot_lab-a2a robot_lab-audit robot_lab-document_store robot_lab-durable robot_lab-ractor robot_lab-rails robot_lab-to robot_lab-web].freeze
   @@extensions ||= (@@repos - ["robot_lab"]).freeze
+
+  desc "Run `bundle update` in all repos (refresh locked dependencies to newest allowed)"
+  def bundle_update_all
+    bundle_across_repos("bundle update")
+  end
+
+  desc "Run `bundle install` in all repos (install the locked dependencies)"
+  def bundle_install_all
+    bundle_across_repos("bundle install")
+  end
 
   desc "Build gem packages in all repos"
   def build_all
@@ -68,5 +78,25 @@ class Tasks
       end
     end
     puts "\nRun `asgard paths` to verify. Run `bundle install` in each extension."
+  end
+
+  no_commands do
+    # Run a bundler command in every repo (core first, then extensions, since
+    # extensions path-depend on robot_lab). Continues past a failing repo and
+    # reports a summary rather than aborting on the first error.
+    def bundle_across_repos(cmd)
+      failed = []
+      @@repos.each do |repo|
+        printf "\e[1;32m%-32s\e[0m %s...\n", repo, cmd
+        failed << repo unless system("cd \"#{repo}\" && #{cmd}")
+      end
+
+      puts ""
+      if failed.empty?
+        puts "\e[32mAll #{@@repos.size} repos: `#{cmd}` succeeded.\e[0m"
+      else
+        abort "\e[31m`#{cmd}` failed in: #{failed.join(', ')}\e[0m"
+      end
+    end
   end
 end
