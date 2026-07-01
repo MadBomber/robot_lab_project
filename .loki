@@ -1,33 +1,20 @@
 # frozen_string_literal: true
 # RobotLab workspace — entry point. Run `asgard help` for available tasks.
+#
+# Pulls in the shared cross-project toolkit from projects/workspace/ (repo lists,
+# @@core, git/quality/gems/sync/overview tasks). ws_repos is loaded first so
+# @@core/@@repos are defined before the other modules reference them.
 
-import "ws_overview.loki"
-import "ws_quality.loki"
-import "ws_gems.loki"
-import "ws_sync.loki"
-import "ws_git.loki"
+import_up "workspace/ws_repos.loki"
+import_up "workspace/*.loki"
 
 class Tasks
-  @@repos      ||= %w[
-    robot_lab
-    robot_lab-a2a
-    robot_lab-audit
-    robot_lab-document_store
-    robot_lab-durable
-    robot_lab-ractor
-    robot_lab-rails
-    robot_lab-to
-    robot_lab-web
-  ].freeze
-  @@extensions ||= (@@repos - ["robot_lab"]).freeze
-  @@github     ||= "git@github.com:MadBomber".freeze
-
   helper(:workspace_version) do
-    file = Dir.glob("robot_lab/lib/**/version.rb").first
+    file = Dir.glob("#{@@core}/lib/**/version.rb").first
     file ? File.read(file)[/VERSION\s*=\s*['"]([^'"]+)['"]/, 1] : "?.?.?" rescue "?.?.?"
   end
 
-  header "RobotLab Workspace v#{workspace_version} — #{@@repos.size} gems"
+  header "RobotLab Workspace v#{workspace_version} — #{@@gems.size} gems + #{(@@repos - @@gems).size} app(s)"
   footer "Run `asgard help <task>` for usage details"
 
   default_task :check
