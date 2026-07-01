@@ -34,6 +34,19 @@ class Tasks
     end
   end
 
+  desc "Push each repo's current branch to its remote"
+  def push
+    @@repos.each do |repo|
+      printf "\e[1;32m%-32s\e[0m", repo
+      result = `git -C "#{repo}" push 2>&1`
+      if $?.success?
+        puts result.include?("up-to-date") ? "up-to-date" : "\e[1;36mpushed\e[0m"
+      else
+        puts "\e[1;31mFAILED\e[0m: #{result.strip.lines.last&.strip}"
+      end
+    end
+  end
+
   desc "each CMD", "Run a shell command in every repo (e.g. asgard each 'git log -1')"
   def each(cmd)
     @@repos.each do |repo|
