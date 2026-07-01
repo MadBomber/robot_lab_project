@@ -1,11 +1,28 @@
+# Shared RuboCop base for the robot_lab_project gem family (project layer).
+# Each component's .rubocop.yml inherits this via `inherit_from: ../.rubocop-base.yml`
+# and adds only its own overrides. This file inherits the universal always-on
+# cops from madbomber/dev/rubocop-strict.yml, located by walking UP the tree
+# (like asgard's import_up) so it survives the project being moved/renested.
+<%
+  require "pathname"
+  strict = Pathname.new(Dir.pwd).ascend.map { |d| d.join("dev", "rubocop-strict.yml") }.find(&:exist?)
+%>
+inherit_from:
+  - <%= strict %>
+
+# Component Exclude lists ADD to these shared ones instead of replacing them.
+inherit_mode:
+  merge:
+    - Exclude
+
 AllCops:
   NewCops: enable
   SuggestExtensions: false
   TargetRubyVersion: 4.0
   Exclude:
-    - 'examples/**/*'
-    - 'vendor/**/*'
-    - 'dead_code/**/*'
+    - '**/examples/**/*'
+    - '**/vendor/**/*'
+    - '**/dead_code/**/*'
 
 # ── Style: disabled cops ───────────────────────────────────────────────────
 Style/StringLiterals:
@@ -52,10 +69,6 @@ Style/OneClassPerFile:
 Style/FormatString:
   Enabled: false
 
-# Unannotated %s / %-Ns tokens are acceptable alongside annotated %<name>s
-Style/FormatStringToken:
-  Enabled: false
-
 # String concatenation and interpolation are both acceptable
 Style/StringConcatenation:
   Enabled: false
@@ -83,7 +96,7 @@ Naming/MethodParameterName:
 
 Naming/VariableNumber:
   Exclude:
-    - 'test/**/*'
+    - '**/test/**/*'
 
 Naming/RescuedExceptionsVariableName:
   Enabled: false
@@ -92,6 +105,7 @@ Naming/RescuedExceptionsVariableName:
 Naming/AccessorMethodName:
   Enabled: false
 
+
 # has_tool_calls? and similar are clear and conventional
 Naming/PredicatePrefix:
   Enabled: false
@@ -99,21 +113,22 @@ Naming/PredicatePrefix:
 # Test helper methods don't need to follow predicate naming rules
 Naming/PredicateMethod:
   Exclude:
-    - 'test/**/*'
+    - '**/test/**/*'
 
 # ── Lint: relax noisy cops on intentional patterns ─────────────────────────
-Lint/EmptyBlock:
-  Exclude:
-    - 'test/**/*'
-
 # Library and framework methods commonly accept args for API/documentation purposes
 Lint/UnusedMethodArgument:
   Enabled: false
 
+
+Lint/EmptyBlock:
+  Exclude:
+    - '**/test/**/*'
+
 Lint/ConstantDefinitionInBlock:
   Exclude:
-    - 'Rakefile'
-    - 'test/**/*'
+    - '**/Rakefile'
+    - '**/test/**/*'
 
 # ── Gemspec ────────────────────────────────────────────────────────────────
 Gemspec/DevelopmentDependencies:
@@ -137,32 +152,32 @@ Metrics/MethodLength:
     - array
     - hash
   Exclude:
-    - 'test/**/*'
+    - '**/test/**/*'
 
 Metrics/AbcSize:
   Max: 40
   Exclude:
-    - 'test/**/*'
+    - '**/test/**/*'
 
 Metrics/ClassLength:
   Max: 600
   Exclude:
-    - 'test/**/*'
+    - '**/test/**/*'
 
 Metrics/ModuleLength:
   Max: 200
   Exclude:
-    - 'test/**/*'
+    - '**/test/**/*'
 
 Metrics/CyclomaticComplexity:
   Max: 20
   Exclude:
-    - 'test/**/*'
+    - '**/test/**/*'
 
 Metrics/PerceivedComplexity:
   Max: 20
   Exclude:
-    - 'test/**/*'
+    - '**/test/**/*'
 
 # Long method signatures with keyword args are a Ruby framework idiom
 Metrics/ParameterLists:
@@ -170,6 +185,6 @@ Metrics/ParameterLists:
 
 Metrics/BlockLength:
   Exclude:
-    - 'Rakefile'
-    - '*.gemspec'
-    - 'test/**/*'
+    - '**/Rakefile'
+    - '**/*.gemspec'
+    - '**/test/**/*'
