@@ -4,28 +4,33 @@ Research into an extensions-based community of robots (aka agents) built on top 
 
 ## Prerequisites
 
-Install the required CLI tools via Homebrew:
+Install the required CLI tools via Homebrew and RubyGems:
 
 ```sh
-brew install direnv just
+brew install direnv
+gem install asgard rake
+```
+
+`asgard` is the CLI took that organizes development tasks in `.loki` files using Thor.  Some tasks are still defined in `Rakefile` so the rake gem will be needed for those tasks.
+
+```sh
+asgard -t # will list all defined tasks
 ```
 
 Add the `direnv` hook to your shell profile if you haven't already — see the [direnv setup guide](https://direnv.net/docs/hook.html).
 
 ## Local Development Setup
 
-Clone this workspace repository, then let `just` pull in all the individual gem repos:
+Clone this workspace repository, then let `asgard` pull in all the individual gem repos:
 
 ```sh
 git clone https://github.com/MadBomber/robot_lab_project.git
 cd robot_lab_project
 direnv allow
-just clone
+asgard clone
 ```
 
-`direnv allow` loads `.envrc`, which tells `just` to look for `robot_lab_project.just` instead of the default `justfile`. `just clone` then clones the core gem and all extensions into the working directory.
-
-Run `just` with no arguments at any time to see all available workspace tasks.
+`direnv allow` loads `.envrc`, which establishes the default system environment variables for this project.
 
 ## Core Gem
 
@@ -43,3 +48,7 @@ Run `just` with no arguments at any time to see all available workspace tasks.
 | [robot_lab-durable](https://github.com/MadBomber/robot_lab-durable) | Persistent cross-session learning and memory for robots |
 | [robot_lab-ractor](https://github.com/MadBomber/robot_lab-ractor) | CPU-parallel robot execution via Ruby Ractors |
 | [robot_lab-rails](https://github.com/MadBomber/robot_lab-rails) | Rails integration — ActiveJob, generators, and Turbo Stream callbacks |
+
+## Why?
+
+Why didn't I just define these different plugins and other projects as git submodules instead of just cloning them within the working directory and putting them in the project's gitignore file?  I don't know.
