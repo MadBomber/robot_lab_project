@@ -14,7 +14,7 @@ class Tasks
     file ? File.read(file)[/VERSION\s*=\s*['"]([^'"]+)['"]/, 1] : "?.?.?" rescue "?.?.?"
   end
 
-  header "RobotLab Workspace v#{workspace_version} — #{@@gems.size} gems + #{(@@repos - @@gems).size} app(s)"
+  header "RobotLab Project Workspace v#{workspace_version} — #{@@gems.size} gems + #{(@@repos - @@gems).size} app(s)"
   footer "Run `asgard help <task>` for usage details"
 
   default_task :check
